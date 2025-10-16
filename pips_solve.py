@@ -20,15 +20,22 @@ def countNumbers(pieces):
 
 def fineNextAvailable(board, hor ):
     lastX = len(board) - 1
-    for i in ( hor, lastX ):
+    for i in range( hor, len(board) ):
+        # print('i:',i)
         if board[i] == -1:
-            if i+1 <= lastX:
+            if i+1 <= lastX and board[i+1] == -1:
                 return i
             else:
+                # print('None found')
                 return None
-        # print('i:',i)
 
+    # print('out of elements')
     return None
+
+
+def placePiece(board, position, piece):
+    board[position]     = piece[0]
+    board[position+1]   = piece[1]
 
 ##########################################################
 
@@ -42,10 +49,11 @@ def fineNextAvailable(board, hor ):
 nextAvailable = fineNextAvailable(board, 0)
 print('next: ', nextAvailable)
 
-board[0] = -2
-print(board)
-nextAvailable = fineNextAvailable(board, 5)
-print('next: ', nextAvailable)
+while nextAvailable is not None:
+    placePiece(board, nextAvailable, (0,0))
+    print('Board:',board)
+    nextAvailable = fineNextAvailable(board, nextAvailable)
+    print('next: ', nextAvailable)
 
 
 print("DONE")
