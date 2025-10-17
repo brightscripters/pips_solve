@@ -18,7 +18,7 @@ def countNumbers(pieces):
     return counts
 
 
-def fineNextAvailable(board, hor ):
+def findNextPosition(board, hor ):
     lastX = len(board) - 1
     for i in range( hor, len(board) ):
         # print('i:',i)
@@ -35,9 +35,13 @@ def fineNextAvailable(board, hor ):
 
 def placePiece(board, position, piece):
     boardClone = board.copy()
-    boardClone[position]     = piece[0]
-    boardClone[position+1]   = piece[1]
+    boardClone[position]     = piece.numbers[0]
+    boardClone[position+1]   = piece.numbers[1]
     return boardClone
+
+
+def fits(board, nextPosition, nextPiece):
+    return True
 
 ##########################################################
 
@@ -49,28 +53,37 @@ def placePiece(board, position, piece):
 # print("counts: ", json.dumps( countNumbers(pieces), indent=4, sort_keys=True ),'\n' )
 
 # Record failures so we don't repeat them
+# Failure captures piece, its rotation and position. 
 fails = {}
 
 # Store sequnce of board and fails
 stack = []
 
-nextAvailable = fineNextAvailable(board, 0)
-print('next: ', nextAvailable)
+nextPosition = findNextPosition(board, 0)
+print('next: ', nextPosition)
+# nextPiece = pieces.pop(0)
 
-
-while nextAvailable is not None:
+while nextPosition is not None and len(pieces) >= 0:
     
-    # Take snapshot
-    stack.append([board,pieces, fails, nextAvailable])
-    
-    board = placePiece(board, nextAvailable, pieces[0].numbers )
-    # print('Board:',board)
-    nextAvailable = fineNextAvailable(board, nextAvailable)
+    # Try next piece
+    nextPiece = pieces.pop(0)
 
-    print('next: ', nextAvailable)
+    if fits(board, nextPosition, nextPiece):
+        # Take snapshot
+        stack.append([board,list(pieces), fails, nextPosition])
+        
+        board = placePiece(board, nextPosition, nextPiece )
+        # print('Board:',board)
+        nextPosition = findNextPosition(board, nextPosition)
+
+        print('next: ', nextPosition)
+    else:
+        # Put back at end
+        pieces.append(nextPiece)
+
 
 # Last snapshot
-stack.append([board,pieces, fails, nextAvailable])
+stack.append([board, list(pieces), fails, nextPosition])
 
 # Print board snapshots
 for step in stack:
