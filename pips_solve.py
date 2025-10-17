@@ -34,8 +34,10 @@ def fineNextAvailable(board, hor ):
 
 
 def placePiece(board, position, piece):
-    board[position]     = piece[0]
-    board[position+1]   = piece[1]
+    boardClone = board.copy()
+    boardClone[position]     = piece[0]
+    boardClone[position+1]   = piece[1]
+    return boardClone
 
 ##########################################################
 
@@ -46,14 +48,33 @@ def placePiece(board, position, piece):
 # Print summary of counts
 # print("counts: ", json.dumps( countNumbers(pieces), indent=4, sort_keys=True ),'\n' )
 
+# Record failures so we don't repeat them
+fails = {}
+
+# Store sequnce of board and fails
+stack = []
+
 nextAvailable = fineNextAvailable(board, 0)
 print('next: ', nextAvailable)
 
+
 while nextAvailable is not None:
-    placePiece(board, nextAvailable, (0,0))
-    print('Board:',board)
+    
+    # Take snapshot
+    stack.append([board,pieces, fails, nextAvailable])
+    
+    board = placePiece(board, nextAvailable, pieces[0].numbers )
+    # print('Board:',board)
     nextAvailable = fineNextAvailable(board, nextAvailable)
+
     print('next: ', nextAvailable)
+
+# Last snapshot
+stack.append([board,pieces, fails, nextAvailable])
+
+# Print board snapshots
+for step in stack:
+    print(step[0])
 
 
 print("DONE")
