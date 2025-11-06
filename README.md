@@ -2,14 +2,19 @@
 
 ## Piece
 * Pair of numbers.
-+ Four States
-    * Swapped: Bool
-    * Rotated: Bool (90deg cw)
 
+### Piece rotation CW
+    0 No rotation
+    1 90 deg CW
+    2 180 deg CW
+    3 270 deg CW
 
-## Placing
-Linked list of nodes.
-Each node represents a piece placed on the board.
+### Piece flipping
+Piece numbers swapped.
+
+## Placement
+A placement is a vector of coordinate on the board, piece rotation, and flip.
+Not specific to a particular piece.
 
 
 ## Square
@@ -25,6 +30,9 @@ Implemented as dict with tuple for key.
 
 board[(0,0)] = newSquare(...)
 
+
+## Condition
+Restriction at a set of coordinates.
 
 ## Conditions
 * Set of named conditions.

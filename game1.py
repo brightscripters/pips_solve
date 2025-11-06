@@ -6,9 +6,9 @@ from pips import piece, newSquare
 
 # Available pieces
 pieces = []
-pieces.append( piece([1,2]) )
-pieces.append( piece([3,4]) )
-pieces.append( piece([5,6]) )
+pieces.append( piece(1,2) )
+pieces.append( piece(3,4) )
+pieces.append( piece(5,6) )
 
 
 # Groups

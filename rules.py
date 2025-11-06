@@ -17,7 +17,7 @@ def exitInfo( frame ):
 ##############################
 def allSame(group):
     if len(group) < 2:
-        print('*** ERROR! A group must have at least two items. Not ', len(group))
+        print('*** @allSame A group must have at least two items. Not ', len(group))
         return None
 
     prev = group[0]
@@ -31,7 +31,7 @@ def allSame(group):
 ##############################
 def allDifferent(group):
     if len(group) < 2:
-        print('*** ERROR! A group must have at least two items. Not ', len(group))
+        print('*** @allDifferent A group must have at least two items. Not ', len(group))
         return None
     
     if len(group) == len(set(group)):

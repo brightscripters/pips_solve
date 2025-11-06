@@ -46,6 +46,7 @@ class piece:
 
         return clone
 
+
 # find available piece rotations at coordinate
 # returns a list of rotations
 def rotationsHere(coordinate, board = [[-1,-1]]):

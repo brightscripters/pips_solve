@@ -18,13 +18,13 @@ def countNumbers(pieces):
     return counts
 
 
-def findNextPosition(board, hor ):
+def findFreeSpace(board, square ):
     lastX = len(board) - 1
-    for i in range( hor, len(board) ):
+    for i in range( square[0], len(board) ):
         # print('i:',i)
         if board[i] == -1:
             if i+1 <= lastX and board[i+1] == -1:
-                return i
+                return (i,0,0)
             else:
                 # print('None found')
                 return None
@@ -33,15 +33,16 @@ def findNextPosition(board, hor ):
     return None
 
 
-def placePiece(board, position, piece):
+def placePiece(board, placement, piece):
     boardClone = board.copy()
-    boardClone[position]     = piece.numbers[0]
-    boardClone[position+1]   = piece.numbers[1]
+    boardClone[placement[0]]     = piece.numbers[0]
+    boardClone[placement[0]+1]   = piece.numbers[1]
     return boardClone
 
 
-def fits(board, nextPosition, nextPiece):
-    return True
+def failed(board, freeSpace, nextPiece):
+    return False
+
 
 ##########################################################
 
@@ -53,40 +54,58 @@ def fits(board, nextPosition, nextPiece):
 # print("counts: ", json.dumps( countNumbers(pieces), indent=4, sort_keys=True ),'\n' )
 
 # Record failures so we don't repeat them
-# Failure captures piece, its rotation and position. 
-fails = {}
+# Failure captures piece, and its placement. 
+fails = set()
 
 # Store sequnce of board and fails
-stack = []
+snapshots = []
 
-nextPosition = findNextPosition(board, 0)
-print('next: ', nextPosition)
-# nextPiece = pieces.pop(0)
+firstSquare = (0,0)
 
-while nextPosition is not None and len(pieces) >= 0:
+# Placement (x,y,rotation)
+freeSpace = findFreeSpace(board, firstSquare )
+print('next: ', freeSpace)
+
+while freeSpace is not None and len(pieces) >= 0:
     
     # Try next piece
     nextPiece = pieces.pop(0)
 
-    if fits(board, nextPosition, nextPiece):
-        # Take snapshot
-        stack.append([board,list(pieces), fails, nextPosition])
-        
-        board = placePiece(board, nextPosition, nextPiece )
-        # print('Board:',board)
-        nextPosition = findNextPosition(board, nextPosition)
+    # Take snapshot
+    snapshots.append([ board,list(pieces), fails ])
+    
+    board = placePiece( board, freeSpace, nextPiece )
 
-        print('next: ', nextPosition)
-    else:
-        # Put back at end
-        pieces.append(nextPiece)
+    # First failure
+    if failed(board, freeSpace, nextPiece):
+        # Undo
+        board, pieces, fails = snapshots.pop()
 
+        # Add placement and piece to fails.
+        fails.add( ( freeSpace, nextPiece ) )
+
+        board = placePiece( board, freeSpace, nextPiece.flip() )
+
+    # Second failure after piece flipped.
+    if failed(board, freeSpace, nextPiece):
+        # Undo
+        board, pieces, fails = snapshots.pop()
+
+        # Add placement and piece to fails.
+        fails.add( ( freeSpace, nextPiece ) )
+
+        # Put piece back at end of list
+        pieces.append( nextPiece )
+
+    freeSpace = findFreeSpace( board, freeSpace[0:1] )
+    print( 'next: ', freeSpace )
+    
 
 # Last snapshot
-stack.append([board, list(pieces), fails, nextPosition])
+snapshots.append([board, list(pieces), fails, freeSpace])
 
 # Print board snapshots
-for step in stack:
+for step in snapshots:
     print(step[0])
 
 
